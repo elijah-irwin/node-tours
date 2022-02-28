@@ -1,7 +1,7 @@
 const Tour = require('../models/tour.model');
 
 exports.getAllTours = async (req, res) => {
-  // Support for advanced query string filtering.
+  // Advanced filtering by query string.
   let queryStr = JSON.stringify(req.query);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   queryStr = JSON.parse(queryStr);
@@ -9,13 +9,23 @@ exports.getAllTours = async (req, res) => {
   // Begin query.
   let query = Tour.find(queryStr);
 
-  // Support for sorting.
+  // Sorting by query strings.
   if (req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
-  } else {
-    query = query.sort('-createdAt');
   }
+
+  // Field limiting by query strings.
+  if (req.query.fields) {
+    const fields = req.query.fields.split(',').join(' ');
+    query = query.select(fields);
+  }
+
+  // Pagination.
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 100;
+  const skip = (page - 1) * limit;
+  query = query.skip(skip).limit(limit);
 
   // Resolve query promise.
   const tours = await query;
