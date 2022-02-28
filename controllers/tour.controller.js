@@ -88,3 +88,11 @@ exports.deleteTour = async (req, res) => {
     data: null,
   });
 };
+
+// Tours Specific Middleware
+exports.top5ToursAlias = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,difficulty';
+  next();
+};
