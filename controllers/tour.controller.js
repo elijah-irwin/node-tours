@@ -1,8 +1,26 @@
 const Tour = require('../models/tour.model');
 
 exports.getAllTours = async (req, res) => {
-  const tours = await Tour.find();
+  // Support for advanced query string filtering.
+  let queryStr = JSON.stringify(req.query);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  queryStr = JSON.parse(queryStr);
 
+  // Begin query.
+  let query = Tour.find(queryStr);
+
+  // Support for sorting.
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ');
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort('-createdAt');
+  }
+
+  // Resolve query promise.
+  const tours = await query;
+
+  // Respond.
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -48,7 +66,7 @@ exports.updateTour = async (req, res) => {
   res.status(200).json({
     status: 'success',
     data: {
-      updatedTour,
+      tour: updatedTour,
     },
   });
 };
