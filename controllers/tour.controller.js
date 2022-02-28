@@ -1,6 +1,16 @@
 const Tour = require('../models/tour.model');
 
-exports.getAllTours = (req, res) => {};
+exports.getAllTours = async (req, res) => {
+  const tours = await Tour.find();
+
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      tours,
+    },
+  });
+};
 
 exports.createTour = async (req, res) => {
   try {
@@ -19,6 +29,34 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.getTour = (req, res) => {};
-exports.updateTour = (req, res) => {};
-exports.deleteTour = (req, res) => {};
+exports.getTour = async (req, res) => {
+  const tour = await Tour.findById(req.params.id);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+};
+
+exports.updateTour = async (req, res) => {
+  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      updatedTour,
+    },
+  });
+};
+
+exports.deleteTour = async (req, res) => {
+  await Tour.findByIdAndDelete(req.params.id);
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
