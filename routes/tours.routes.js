@@ -8,6 +8,8 @@ router
   .get(tourController.getAllTours)
   .post(tourController.createTour);
 
+router.route('/tour-stats').get(tourController.getTourStats);
+
 router
   .route('/top5-tours')
   .get(tourController.top5ToursAlias, tourController.getAllTours);

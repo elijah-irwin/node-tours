@@ -1,34 +1,16 @@
 const Tour = require('../models/tour.model');
+const ApiFeatures = require('../utils/ApiFeatures');
 
 exports.getAllTours = async (req, res) => {
-  // Advanced filtering by query string.
-  let queryStr = JSON.stringify(req.query);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  queryStr = JSON.parse(queryStr);
-
-  // Begin query.
-  let query = Tour.find(queryStr);
-
-  // Sorting by query strings.
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  }
-
-  // Field limiting by query strings.
-  if (req.query.fields) {
-    const fields = req.query.fields.split(',').join(' ');
-    query = query.select(fields);
-  }
-
-  // Pagination.
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 100;
-  const skip = (page - 1) * limit;
-  query = query.skip(skip).limit(limit);
+  // Add required api features to query.
+  const features = new ApiFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
   // Resolve query promise.
-  const tours = await query;
+  const tours = await features.query;
 
   // Respond.
   res.status(200).json({
@@ -61,9 +43,7 @@ exports.getTour = async (req, res) => {
   const tour = await Tour.findById(req.params.id);
   res.status(200).json({
     status: 'success',
-    data: {
-      tour,
-    },
+    data: { tour },
   });
 };
 
@@ -75,9 +55,7 @@ exports.updateTour = async (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      tour: updatedTour,
-    },
+    data: { tour: updatedTour },
   });
 };
 
@@ -89,7 +67,38 @@ exports.deleteTour = async (req, res) => {
   });
 };
 
+exports.getTourStats = async (req, res) => {
+  const stats = await Tour.aggregate([
+    {
+      $match: {
+        ratingsAverage: { $gte: 4.5 },
+      },
+    },
+    {
+      $group: {
+        _id: '$difficulty',
+        numTours: { $sum: 1 },
+        numRatings: { $sum: '$ratingsQuantity' },
+        avgRating: { $avg: '$ratingsAverage' },
+        avgPrice: { $avg: '$price' },
+        minPrice: { $min: '$price' },
+        maxPrice: { $max: '$price' },
+      },
+    },
+    {
+      $sort: { avgPrice: 1 },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: { stats },
+  });
+};
+
+// *****************************
 // Tours Specific Middleware
+// *****************************
 exports.top5ToursAlias = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
