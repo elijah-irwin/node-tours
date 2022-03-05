@@ -40,6 +40,12 @@ const handleDBValidationError = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = () =>
+  new AppError('Invalid authorization token. 😔', 401);
+
+const handleJWTExpiredError = () =>
+  new AppError('Authorization token expired. 😔', 401);
+
 exports.baseErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
@@ -52,6 +58,8 @@ exports.baseErrorHandler = (err, req, res, next) => {
     if (err.name === 'CastError') err = handleDBCastError(err);
     if (err.name === 'ValidationError') err = handleDBValidationError(err);
     if (err.code === 11000) err = handleDBDuplicateError(err);
+    if (err.name === 'JsonWebTokenError') err = handleJWTError();
+    if (err.name === 'TokenExpiredError') err = handleJWTExpiredError();
     return sendErrorProd(err, res);
   }
 };
