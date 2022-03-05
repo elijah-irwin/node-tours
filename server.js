@@ -10,10 +10,9 @@ mongoose
   })
   .then(() => {
     console.log('DB connection successful!');
-  });
+  })
+  .catch((err) => console.log(err.name, err.message));
 
 // Run Server.
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Maks Tours is running on port: ${port}!`);
-});
+app.listen(port, () => console.log(`Maks Tour's is running on port: ${port}!`));
