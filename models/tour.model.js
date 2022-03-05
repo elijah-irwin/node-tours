@@ -5,25 +5,26 @@ const tourSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Tour name is required!'],
+      required: [true, 'Tour name is required'],
       unique: true,
       trim: true,
     },
     slug: String,
     duration: {
       type: Number,
-      required: [true, 'Tour duration is required!'],
+      required: [true, 'Tour duration is required'],
     },
     maxGroupSize: {
       type: Number,
-      required: [true, 'Tour max group size is required!'],
+      required: [true, 'Tour max group size is required'],
     },
     difficulty: {
       type: String,
-      required: [true, 'Tour must have a difficulty!'],
+      required: [true, 'Tour must have a difficulty'],
       enum: {
         values: ['easy', 'medium', 'difficult'],
-        message: 'Please use easy, medium, or difficult',
+        message:
+          'Difficulty must match one of the following: easy, medium, difficult',
       },
     },
     ratingsAverage: {
@@ -38,7 +39,7 @@ const tourSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, 'Tour price is required!'],
+      required: [true, 'Tour price is required'],
     },
     priceDiscount: {
       type: Number,
@@ -47,13 +48,13 @@ const tourSchema = new mongoose.Schema(
           // this only points to current doc on NEW document creation
           return val < this.price;
         },
-        message: 'Price discount ({VALUE}) cannot exceed the tour price.',
+        message: 'Price discount ({VALUE}) cannot exceed the tour price',
       },
     },
     summary: {
       type: String,
       trim: true,
-      required: [true, 'Tour must have a summary!'],
+      required: [true, 'Tour must have a summary'],
     },
     description: {
       type: String,
@@ -61,7 +62,7 @@ const tourSchema = new mongoose.Schema(
     },
     imageCover: {
       type: String,
-      required: [true, 'Tour must have a cover image!'],
+      required: [true, 'Tour must have a cover image'],
     },
     images: [String],
     startDates: [Date],

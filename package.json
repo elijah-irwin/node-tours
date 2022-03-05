@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "local": "nodemon server.js",
+    "prod": "set NODE_ENV=production&& nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
