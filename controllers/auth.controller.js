@@ -50,6 +50,19 @@ exports.signIn = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Check if user actually exists.
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return next(new AppError('User not found.', 404));
+
+  // 2) Generate the random reset token.
+  const resetToken = user.createPassResetToken();
+  await user.save({ validateBeforeSave: false });
+});
+
+// *****************************
+// Auth Specific Middleware
+// *****************************
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Get the token.
   let token;
@@ -75,3 +88,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (roles.includes(req.user.role)) return next();
+    return next(new AppError('No Permission.', 403));
+  };

@@ -11,6 +11,8 @@ router
 
 router.post('/sign-up', authController.signUp);
 router.post('/sign-in', authController.signIn);
+router.post('/forgot-password', authController.forgotPassword);
+// router.post('/reset-password', authController.resetPassword);
 
 router
   .route('/:id')
