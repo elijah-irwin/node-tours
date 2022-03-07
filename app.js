@@ -13,6 +13,7 @@ const { baseErrorHandler } = require('./utils/error-handlers');
 // Routers
 const tourRouter = require('./routes/tours.routes');
 const userRouter = require('./routes/users.routes');
+const reviewRouter = require('./routes/review.routes');
 
 // Create App.
 const app = express();
@@ -48,6 +49,7 @@ app.use(express.static(`${__dirname}/public`));
 // Mounting Routes.
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // Catch All Route.
 app.all('*', (req, res, next) => {
