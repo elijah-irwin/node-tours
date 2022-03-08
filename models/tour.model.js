@@ -109,6 +109,14 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// Indexes
+// Single key index.
+// tourSchema.index({ price: 1 });
+tourSchema.index({ slug: 1 });
+
+// Compount index. Also works for only 1 of the keys at a time.
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+
 // Virutals
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
