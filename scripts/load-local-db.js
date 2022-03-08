@@ -6,6 +6,8 @@ dotenv.config({ path: '../.env' });
 
 // Local imports.
 const Tour = require('../models/tour.model');
+const User = require('../models/user.model');
+const Review = require('../models/review.model');
 
 // DB connection.
 mongoose
@@ -21,16 +23,26 @@ mongoose
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours.json`, 'utf-8')
 );
+const users = JSON.parse(
+  fs.readFileSync(`${__dirname}/../dev-data/data/users.json`, 'utf-8')
+);
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/../dev-data/data/reviews.json`, 'utf-8')
+);
 
 // Delete old data.
 const deleteAllTours = async () => {
   await Tour.deleteMany();
+  await User.deleteMany();
+  await Review.deleteMany();
   process.exit();
 };
 
 // Create tour data.
 const createTours = async () => {
   await Tour.create(tours);
+  await User.create(users, { validateBeforeSave: false });
+  await Review.create(reviews);
   process.exit();
 };
 
