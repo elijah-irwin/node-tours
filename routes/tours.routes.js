@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const tourController = require('../controllers/tour.controller');
 const authController = require('../controllers/auth.controller');
+const reviewRouter = require('./review.routes');
 
 router
   .route('/')
@@ -25,5 +26,7 @@ router
     authController.restrictTo('lead-guide', 'admin'),
     tourController.deleteTour
   );
+
+router.use('/:tourId/reviews', reviewRouter);
 
 module.exports = router;

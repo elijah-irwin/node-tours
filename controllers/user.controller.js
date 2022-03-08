@@ -1,19 +1,9 @@
 const User = require('../models/user.model');
 const { catchAsync } = require('../utils/error-handlers');
 const AppError = require('../utils/AppError');
+const factory = require('../utils/handlers-factory');
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: { users },
-  });
-});
-
-exports.createUser = (req, res) => {};
-
+// Helpers
 const filterUpdateObj = (obj, ...allowedFields) => {
   const update = {};
   Object.keys(obj).forEach((el) => {
@@ -22,6 +12,7 @@ const filterUpdateObj = (obj, ...allowedFields) => {
   return update;
 };
 
+// Controllers
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword)
     return next(new AppError('Cant update password here.', 400));
@@ -46,6 +37,8 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {};
-exports.updateUser = (req, res) => {};
-exports.deleteUser = (req, res) => {};
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
+exports.createUser = (req, res) => {};
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);

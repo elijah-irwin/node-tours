@@ -1,8 +1,11 @@
 const Review = require('../models/review.model');
 const { catchAsync } = require('../utils/error-handlers');
+const factory = require('../utils/handlers-factory');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+  const reviews = await Review.find(filter);
 
   res.status(200).json({
     status: 'success',
@@ -11,11 +14,16 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createReview = catchAsync(async (req, res, next) => {
-  const newReview = await Review.create(req.body);
+exports.createReview = factory.createOne(Review);
+exports.getReview = factory.getOne(Review, { path: 'user' });
+exports.updateReview = factory.updateOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
 
-  res.status(201).json({
-    status: 'success',
-    data: { review: newReview },
-  });
-});
+// *****************************
+// Reviews Specific Middleware
+// *****************************
+exports.setTourUserIds = (req, res, next) => {
+  if (req.params.tourId) req.body.tour = req.params.tourId;
+  req.body.user = req.user.id;
+  next();
+};
