@@ -8,10 +8,20 @@ const reviewRouter = require('./review.routes');
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.createTour
+  );
 
 router.route('/tour-stats').get(tourController.getTourStats);
-router.route('/monthly-tours/:year').get(tourController.getMonthlyTours);
+router
+  .route('/monthly-tours/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('lead-guide', 'admin', 'guide'),
+    tourController.getMonthlyTours
+  );
 
 router
   .route('/top5-tours')
@@ -20,7 +30,11 @@ router
 router
   .route('/:id')
   .get(tourController.getTour)
-  .patch(tourController.updateTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo('lead-guide', 'admin'),
+    tourController.updateTour
+  )
   .delete(
     authController.protect,
     authController.restrictTo('lead-guide', 'admin'),

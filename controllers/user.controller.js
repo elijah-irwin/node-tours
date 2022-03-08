@@ -12,6 +12,11 @@ const filterUpdateObj = (obj, ...allowedFields) => {
   return update;
 };
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 // Controllers
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword)
